@@ -276,18 +276,22 @@ function actualizarEstadisticas() {
     $('#lbl_progreso').text(progreso + '%');
 }
 
+let editando_tarea = false;
+
 // ----- Abrir modal para crear tarea -----
-$('#modal_tarea').on('show.bs.modal', function(e) {
-    if (!$(e.relatedTarget).hasClass('btn-editar-tarea')) {
+$('#modal_tarea').on('show.bs.modal', function() {
+    if (!editando_tarea) {
         $('#modal_tarea_titulo').text('Nueva Tarea');
         $('#tarea_id').val('');
         $('#form_tarea')[0].reset();
         limpiarErroresTarea();
     }
+    editando_tarea = false;
 });
 
 // ----- Abrir modal para editar tarea -----
 $(document).on('click', '.btn-editar-tarea', function() {
+    editando_tarea = true;
     const $btn = $(this);
     $('#modal_tarea_titulo').text('Editar Tarea');
     $('#tarea_id').val($btn.data('id'));

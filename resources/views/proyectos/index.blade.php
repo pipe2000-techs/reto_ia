@@ -87,7 +87,8 @@ function mostrarErrores(errors) {
 
 function construirCardHtml(p) {
     const progreso = p.progreso ?? 0;
-    const fecha = p.fecha_limite ? new Date(p.fecha_limite).toLocaleDateString('es-MX') : 'Sin fecha';
+    const fecha_ymd = p.fecha_limite ? p.fecha_limite.substring(0, 10) : null;
+    const fecha = fecha_ymd ? fecha_ymd.split('-').reverse().join('/') : 'Sin fecha';
     const total = p.tareas_count ?? 0;
     const terminadas = p.tareas_terminadas_count ?? 0;
 
@@ -117,7 +118,7 @@ function construirCardHtml(p) {
                     data-id="${p.id}"
                     data-nombre="${escapeHtml(p.nombre)}"
                     data-descripcion="${escapeAttr(p.descripcion)}"
-                    data-fecha="${p.fecha_limite ?? ''}">
+                    data-fecha="${fecha_ymd ?? ''}">
                     <i class="bi bi-pencil me-1"></i>Editar
                 </button>
                 <button class="btn btn-sm btn-outline-danger btn-eliminar-proyecto" data-id="${p.id}" data-nombre="${escapeHtml(p.nombre)}">
@@ -138,18 +139,22 @@ function escapeAttr(str) {
     return String(str).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+let editando_proyecto = false;
+
 // ----- Abrir modal para crear -----
-$('#modal_proyecto').on('show.bs.modal', function(e) {
-    if (!$(e.relatedTarget).hasClass('btn-editar-proyecto')) {
+$('#modal_proyecto').on('show.bs.modal', function() {
+    if (!editando_proyecto) {
         $('#modal_proyecto_titulo').text('Nuevo Proyecto');
         $('#proyecto_id').val('');
         $('#form_proyecto')[0].reset();
         limpiarErrores();
     }
+    editando_proyecto = false;
 });
 
 // ----- Abrir modal para editar -----
 $(document).on('click', '.btn-editar-proyecto', function() {
+    editando_proyecto = true;
     const $btn = $(this);
     $('#modal_proyecto_titulo').text('Editar Proyecto');
     $('#proyecto_id').val($btn.data('id'));
